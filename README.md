@@ -1,61 +1,218 @@
-# 🚀 fastapi-hackathonkit
+# RecipieSuggestor API Documentation
 
-![Badge](https://img.shields.io/badge/Made%20with-FastAPI-green) ![Badge](https://img.shields.io/badge/PostgreSQL-For%20All%20Your%20Data%20Needs-blue) ![Badge](https://img.shields.io/badge/Dockerized-Yep!-2496ED) ![Badge](https://img.shields.io/badge/Forked-But%20Revamped-red)
+This document provides an overview of the API endpoints available in the RecipieSuggestor application.
 
-## Setup & Run 🏃‍♂️
+---
 
-- Clone this repository:
-```bash
-git clone https://github.com/jahangir1x/fastapi-hackathonkit.git
+## Overview
+
+**API Version:** 0.1.0  
+**Base URL:** `/api/v1/`
+
+### Description
+
+The RecipieSuggestor application allows users to manage and retrieve recipes and ingredients efficiently. Here's how it works:
+
+1. **Recipe Management:**
+   - Users save their recipes in a text file.
+   - The recipe text is sent to the system using a POST request to the `/recipes/` endpoint.
+   - The recipe is stored in a vector database associated with an LLM (Large Language Model).
+
+2. **Ingredient Management:**
+   - Users can manage ingredients they have through the `/ingredients/` API.
+   - If new ingredients are purchased, they are added to the database via a POST request.
+   - When ingredients are used in cooking a recipe, they are removed from the database via a DELETE request.
+
+3. **Recipe Suggestions:**
+   - Users provide a prompt, such as "I want to cook something sweet," to the `/suggestions/` endpoint.
+   - The LLM combines the available ingredients and stored recipes to generate a suitable recipe suggestion.
+
+---
+
+
+## Endpoints
+
+### Recipes
+
+#### 1. Create Recipe
+
+**Route:** `/recipes/`  
+**Method:** `POST`  
+**Tags:** `recipes`  
+
+**Description:** Create a new recipe.
+
+**Request Body:**
+```json
+{
+  "details": "string"
+}
 ```
 
-- Set up your environment by copying the template .env file:
-```bash
-cd fastapi-hackathonkit
+**Response:**
+- **200:** Successful Response
+  ```json
+  {
+    "status": "string"
+  }
+  ```
+- **422:** Validation Error
+  ```json
+  {
+    "detail": [
+      {
+        "loc": ["string", "integer"],
+        "msg": "string",
+        "type": "string"
+      }
+    ]
+  }
+  ```
 
-cp dot-env-template .env   # linux
-copy dot-env-template .env # windows
+---
+
+### Ingredients
+
+#### 1. Retrieve Ingredients
+
+**Route:** `/ingredients/`  
+**Method:** `GET`  
+**Tags:** `ingredients`  
+
+**Description:** Retrieve a list of ingredients.
+
+**Query Parameters:**
+- `skip` (integer, default: 0): Number of items to skip.
+- `limit` (integer, default: 100): Maximum number of items to retrieve.
+
+**Response:**
+- **200:** Successful Response
+  ```json
+  [
+    {
+      "id": "integer",
+      "name": "string"
+    }
+  ]
+  ```
+- **422:** Validation Error
+  ```json
+  {
+    "detail": [
+      {
+        "loc": ["string", "integer"],
+        "msg": "string",
+        "type": "string"
+      }
+    ]
+  }
+  ```
+
+#### 2. Create Ingredient
+
+**Route:** `/ingredients/`  
+**Method:** `POST`  
+**Tags:** `ingredients`  
+
+**Description:** Create a new ingredient.
+
+**Request Body:**
+```json
+{
+  "name": "string"
+}
 ```
 
-- For local development
-```bash
-python -m venv .pyenv
+**Response:**
+- **200:** Successful Response
+  ```json
+  {
+    "id": "integer",
+    "name": "string"
+  }
+  ```
+- **422:** Validation Error
+  ```json
+  {
+    "detail": [
+      {
+        "loc": ["string", "integer"],
+        "msg": "string",
+        "type": "string"
+      }
+    ]
+  }
+  ```
 
-source .pyenv/bin/activate # linux
-.pyenv\Scripts\activate     # windows
+#### 3. Delete Ingredient
 
-pip install -r requirements.txt
+**Route:** `/ingredients/{id}`  
+**Method:** `DELETE`  
+**Tags:** `ingredients`  
 
-export PYTHONPATH=$PWD # linux
-set PYTHONPATH=%cd%    # windows
+**Description:** Delete an ingredient by ID.
 
-# make sure your postgresql server is running
-python app/check_db_connection.py
-alembic upgrade head
-python app/seed_db_with_initial_data.py
-fastapi dev app/main.py --reload
+**Path Parameters:**
+- `id` (integer): The ID of the ingredient to delete.
+
+**Response:**
+- **200:** Successful Response
+  ```json
+  {
+    "id": "integer",
+    "name": "string"
+  }
+  ```
+- **422:** Validation Error
+  ```json
+  {
+    "detail": [
+      {
+        "loc": ["string", "integer"],
+        "msg": "string",
+        "type": "string"
+      }
+    ]
+  }
+  ```
+
+---
+
+### Suggestions
+
+#### 1. Create Suggestion
+
+**Route:** `/suggestions/`  
+**Method:** `POST`  
+**Tags:** `suggestions`  
+
+**Description:** Exact Prompt From user
+
+**Request Body:**
+```json
+{
+  "details": "string"
+}
 ```
 
-- For Docker
-```bash
-docker-compose up --build
-```
+**Response:**
+- **200:** Successful Response
+  ```json
+  {
+    "details": "string"
+  }
+  ```
+- **422:** Validation Error
+  ```json
+  {
+    "detail": [
+      {
+        "loc": ["string", "integer"],
+        "msg": "string",
+        "type": "string"
+      }
+    ]
+  }
+  ```
 
-## Workflow 🛠 ️
-##### Define models
-- Edit `app/models/{new_item}.py`
-- Then we need to register the model in `app/models/__init__.py`
-##### Create revision for the model
-- create revision file with `$ alembic revision --autogenerate -m "Add {new_item} table"`
-- then upgrade the database with `$ alembic upgrade head`
-##### Add some dummy data in the database.
-- Open any database client and add some data in the table.
-##### Define schemas
-- Edit `app/schemas/{new_item}.py`
-- Then we need to register the schema in `app/schemas/__init__.py`
-##### Define CRUD operations
-- Edit `app/crud/{new_item}.py`
-- Then we need to register the crud in `app/crud/__init__.py`
-##### Define API endpoints
-- Edit `app/api/api_v{x}/{new_item}.py`
-- Then we need to register the router in `app/api/api_v{x}/api.py`
+---
