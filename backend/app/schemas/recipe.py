@@ -26,8 +26,8 @@ class RecipeInDBBase(RecipeBase):
 
 
 # Properties to return to client
-class Recipe(RecipeInDBBase):
-    pass
+class RecipeResponse(BaseModel):
+    status: str
 
 
 # Properties properties stored in DB

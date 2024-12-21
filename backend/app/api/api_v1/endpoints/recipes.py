@@ -9,17 +9,16 @@ from app.api import deps
 router = APIRouter()
 
 
-@router.post("/", response_model=schemas.Recipe)
+@router.post("/", response_model=schemas.RecipeResponse)
 def create_item(
     *,
-    db: Session = Depends(deps.get_db),
     item_in: schemas.RecipeCreate,
 ) -> Any:
     """
     Create new item.
     """
-    item = crud.recipe.process_recipe(db=db, obj_in=item_in)
-    return item
+    status = crud.recipe.process_recipe(obj_in=item_in)
+    return status
 
 
 # @router.put("/{id}", response_model=schemas.Item)
