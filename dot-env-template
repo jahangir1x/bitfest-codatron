@@ -1,3 +1,6 @@
+# AI
+GROQ_API_KEY=your_groq_api_key
+
 # Backend
 SERVER_NAME=my_server_name
 SERVER_HOST=http://localhost
