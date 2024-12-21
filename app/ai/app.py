@@ -16,7 +16,7 @@ load_dotenv()
 
 groq_api_key = os.environ['GROQ_API_KEY']
 
-ingredients = 'milk, lemon juice, sugar, water, cardamom pods, Mustard oil' 
+
 
 if "vector" not in st.session_state:
     st.session_state.embeddings = OllamaEmbeddings()
@@ -30,17 +30,16 @@ if "vector" not in st.session_state:
 st.title("Recipee Demo")
 llm = ChatGroq(groq_api_key = groq_api_key,
                model_name='mixtral-8x7b-32768')
-
+ingredients = "milk, lemon juice, sugar, water, cardamom pods, Mustard oil"
 prompt = ChatPromptTemplate.from_template(
     """
-You are a recipee assistant. Here are the list of ingredients:{ingredients}
-
- A list of recipees will be given to you as context.Save each user separately. User will tell you his craving and you have to output a recipee according to his craving and which can be made with those ingredients. 
+You are a recipee assistant. Here are the list of ingredients. A list of recipees will be given to you as context.Save each user separately. User will tell you his craving and you have to output a recipee according to his craving and which can be made with those ingredients. 
 Please provide accurate recipee from the given context which matches user's craving and which can be made using those ingredients.
 <context>
 {context}
 <context>
 User: {input}
+Ingredients: {ingredients}
 """
 )
 document_chain = create_stuff_documents_chain(llm, prompt)
@@ -51,5 +50,5 @@ retrieval_chain = create_retrieval_chain(retrieval, document_chain)
 prompt = st.text_input("Input your prompt here")
 
 if prompt:
-    response = retrieval_chain.invoke({"input":prompt})
+    response = retrieval_chain.invoke({"input":prompt, "ingredients": ingredients})
     st.write(response['answer'])
